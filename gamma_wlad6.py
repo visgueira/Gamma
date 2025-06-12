@@ -1,16 +1,8 @@
-import tempfile
-import subprocess
-import sys
-import os
-
-def run_streamlit_embutido():
-    # Código Streamlit embutido como string
-    streamlit_code = """import pandas as pd
+import pandas as pd
 import plotly.graph_objs as go
 import numpy as np
 from scipy.stats import norm
 from datetime import datetime, timedelta
-import os
 import streamlit as st
 
 
@@ -27,8 +19,30 @@ def isThirdFriday(d):
     return d.weekday() == 4 and 15 <= d.day <= 21
 
 
+def check_login():
+    st.sidebar.subheader("🔐 Acesso Restrito")
+    username = st.sidebar.text_input("Usuário")
+    password = st.sidebar.text_input("Senha", type="password")
+
+    # Usuários válidos
+    valid_users = {
+        "admin": "1234",
+        "usuario": "senha"
+    }
+
+    if username in valid_users and password == valid_users[username]:
+        return True
+    elif username and password:
+        st.sidebar.error("Usuário ou senha incorretos.")
+    return False
+
+
 def main():
     st.set_page_config(layout="wide")
+
+    if not check_login():
+        st.stop()
+
     st.title("Análise de Gamma Exposure")
 
     with st.sidebar:
@@ -90,7 +104,7 @@ def main():
         fig1.update_layout(title=f"Total Gamma: ${df['TotalGamma'].sum():,.2f} Bn per 1% ATIVO Move",
             xaxis_title='Strike', yaxis_title='Spot Gamma Exposure ($ billions/1% move)',
             xaxis=dict(range=[fromStrike, toStrike]), yaxis=dict(tickformat='$,.2f'),
-            plot_bgcolor='black', font=dict(family='Arial', size=12, color='black'), width=1000, height=600)
+            plot_bgcolor='white', font=dict(family='Arial', size=12, color='black'), width=1000, height=600)
         st.plotly_chart(fig1, use_container_width=True)
 
         st.download_button("Baixar Gráfico 1 como HTML", fig1.to_html(full_html=False), file_name="grafico1_total_gamma.html")
@@ -152,19 +166,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-    """
 
-    # Cria arquivo temporário e executa o app Streamlit
-    with tempfile.NamedTemporaryFile('w', suffix='.py', delete=False, encoding='utf-8') as temp_file:
-        temp_file.write(streamlit_code)
-        temp_path = temp_file.name
-
-    try:
-        subprocess.run(["streamlit", "run", temp_path])
-        
-
-    finally:
-        os.remove(temp_path)
-
-if __name__ == "__main__":
-    run_streamlit_embutido()
