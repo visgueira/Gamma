@@ -23,6 +23,7 @@ def check_login():
     st.sidebar.subheader("🔐 Acesso Restrito")
     username = st.sidebar.text_input("Usuário")
     password = st.sidebar.text_input("Senha", type="password")
+    pass
 
     # Usuários válidos
     usuarios = st.secrets["auth"]["usuarios"]
