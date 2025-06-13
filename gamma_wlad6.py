@@ -19,24 +19,6 @@ def isThirdFriday(d):
     return d.weekday() == 4 and 15 <= d.day <= 21
 
 
-def check_login():
-    with st.sidebar:
-        st.subheader("🔐 Acesso Restrito")
-        username = st.text_input("Usuário")
-        password = st.text_input("Senha", type="password")
-
-    usuarios = st.secrets["auth"]["usuarios"]
-    valid_pass = st.secrets["auth"]["passw"]
-
-    if username in usuarios and password in valid_pass:
-        st.session_state["authenticated"] = True
-        return True
-    elif username and password:
-        st.sidebar.error("Usuário ou senha incorretos.")
-        st.session_state["authenticated"] = False
-    return False
-
-
 def main():
     st.set_page_config(layout="wide")
 
@@ -44,9 +26,22 @@ def main():
         st.session_state["authenticated"] = False
 
     if not st.session_state["authenticated"]:
-        if not check_login():
-            st.stop()
+        with st.sidebar:
+            st.subheader("🔐 Acesso Restrito")
+            username = st.text_input("Usuário")
+            password = st.text_input("Senha", type="password")
 
+        usuarios = st.secrets["auth"]["usuarios"]
+        valid_pass = st.secrets["auth"]["passw"]
+
+        if username in usuarios and password in valid_pass:
+            st.session_state["authenticated"] = True
+            st.experimental_rerun()
+        elif username and password:
+            st.sidebar.error("Usuário ou senha incorretos.")
+        st.stop()
+
+    # Interface principal pós-login
     st.title("Análise de Gamma Exposure")
 
     with st.sidebar:
