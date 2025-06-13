@@ -26,7 +26,7 @@ def check_login():
 
     # Usuários válidos
     valid_users = {
-        "admin": "1234",
+        "admin": "Pqw74nbc8z@&",
         "wlca": "17151" 
     }
 
