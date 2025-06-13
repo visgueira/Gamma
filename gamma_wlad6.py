@@ -50,7 +50,7 @@ def main():
         bar_width1 = st.number_input("Largura das barras do Gráfico 1 (ex: 0.3)", min_value=0.01, max_value=1.0, step=0.01, value=0.3)
         bar_width2 = st.number_input("Largura das barras do Gráfico 2 (ex: 0.2)", min_value=0.01, max_value=1.0, step=0.01, value=0.2)
         levels_input = st.slider("Quantidade de níveis (resolução do gráfico 3)", min_value=20, max_value=100, step=5, value=60)
-        bar_color1 = st.color_picker("Cor das barras do Gráfico 1", '#1a76ff')
+        bar_color1 = st.color_picker("Cor das barras do Gráfico 1",  '#1a76ff')
         bar_color2 = st.color_picker("Cor das barras do Gráfico 2 (Call)", '#00cc96')
         bar_color3 = st.color_picker("Cor das barras do Gráfico 2 (Put)", '#ef553b')
 
