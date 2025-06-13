@@ -27,7 +27,7 @@ def check_login():
     # Usuários válidos
     valid_users = {
         "admin": "1234",
-        "usuario": "senha"
+        "wlca": "17151" 
     }
 
     if username in valid_users and password == valid_users[username]:
