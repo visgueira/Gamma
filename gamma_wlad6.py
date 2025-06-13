@@ -25,15 +25,15 @@ def check_login():
     password = st.sidebar.text_input("Senha", type="password")
 
     # Usuários válidos
-    valid_user = st.secrets(user)
-    valid_pass = st.secrets(passw)
+    usuarios = st.secrets[user]
+    valid_pass = st.secrets[passw]
     
     '''valid_users = {
         "admin": "Pqw74nbc8z@&",
         "wlca": "17151" 
     }'''
 
-    if username in valid_user and password in valid_pass[passw]:#if username in valid_users and password == valid_users[username]:
+    if username in usuarios and password in valid_pass[passw]:#if username in valid_users and password == valid_users[username]:
         return True
     elif username and password:
         st.sidebar.error("Usuário ou senha incorretos.")
