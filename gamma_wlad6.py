@@ -20,11 +20,11 @@ def isThirdFriday(d):
 
 
 def check_login():
-    st.sidebar.subheader("🔐 Acesso Restrito")
-    username = st.sidebar.text_input("Usuário")
-    password = st.sidebar.text_input("Senha", type="password")
+    with st.sidebar:
+        st.subheader("🔐 Acesso Restrito")
+        username = st.text_input("Usuário")
+        password = st.text_input("Senha", type="password")
 
-    # Usuários válidos (usando secrets)
     usuarios = st.secrets["auth"]["usuarios"]
     valid_pass = st.secrets["auth"]["passw"]
 
@@ -46,7 +46,9 @@ def main():
     with st.sidebar:
         st.markdown("### 📁 Parâmetros de Entrada")
         uploaded_file = st.file_uploader("Envie o arquivo quotedata.csv", type="csv")
-        if uploaded_file:
+
+    if uploaded_file:
+        with st.sidebar:
             bar_width1 = st.number_input("Largura das barras do Gráfico 1 (ex: 0.3)", min_value=0.01, max_value=1.0, step=0.01, value=0.3)
             bar_width2 = st.number_input("Largura das barras do Gráfico 2 (ex: 0.2)", min_value=0.01, max_value=1.0, step=0.01, value=0.2)
             levels_input = st.slider("Quantidade de níveis (resolução do gráfico 3)", min_value=20, max_value=100, step=5, value=60)
@@ -54,8 +56,6 @@ def main():
             bar_color2 = st.color_picker("Cor das barras do Gráfico 2 (Call)", '#00cc96')
             bar_color3 = st.color_picker("Cor das barras do Gráfico 2 (Put)", '#ef553b')
 
-    if uploaded_file:
-        # (restante do código permanece inalterado)
         optionsFileData = uploaded_file.getvalue().decode("utf-8").splitlines()
 
         spotLine = optionsFileData[1]
