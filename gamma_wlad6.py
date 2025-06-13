@@ -29,24 +29,29 @@ def check_login():
     valid_pass = st.secrets["auth"]["passw"]
 
     if username in usuarios and password in valid_pass:
+        st.session_state["authenticated"] = True
         return True
     elif username and password:
         st.sidebar.error("Usuário ou senha incorretos.")
+        st.session_state["authenticated"] = False
     return False
 
 
 def main():
     st.set_page_config(layout="wide")
 
-    if not check_login():
-        st.stop()
+    if "authenticated" not in st.session_state:
+        st.session_state["authenticated"] = False
+
+    if not st.session_state["authenticated"]:
+        if not check_login():
+            st.stop()
 
     st.title("Análise de Gamma Exposure")
 
     with st.sidebar:
         st.markdown("### 📁 Parâmetros de Entrada")
         uploaded_file = st.file_uploader("Envie o arquivo quotedata.csv", type="csv")
-
         bar_width1 = st.number_input("Largura das barras do Gráfico 1 (ex: 0.3)", min_value=0.01, max_value=1.0, step=0.01, value=0.3)
         bar_width2 = st.number_input("Largura das barras do Gráfico 2 (ex: 0.2)", min_value=0.01, max_value=1.0, step=0.01, value=0.2)
         levels_input = st.slider("Quantidade de níveis (resolução do gráfico 3)", min_value=20, max_value=100, step=5, value=60)
