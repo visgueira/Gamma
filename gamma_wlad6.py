@@ -97,14 +97,14 @@ def main():
 
         st.subheader("Gráfico 1: Total Gamma")
         fig1 = go.Figure(go.Bar(x=strikes, y=dfAgg['TotalGamma'].to_numpy(), width=bar_width1,
-            marker_color=bar_color1, marker_line_color='black', marker_line_width=0.15,
+            marker_color=bar_color1, marker_line_color='white', marker_line_width=0.15,
             name='Gamma Exposure'))
         fig1.add_shape(type='line', x0=spotPrice, y0=min(dfAgg['TotalGamma']), x1=spotPrice,
             y1=max(dfAgg['TotalGamma']), line=dict(color='red', width=2, dash='dash'))
         fig1.update_layout(title=f"Total Gamma: ${df['TotalGamma'].sum():,.2f} Bn per 1% ATIVO Move",
             xaxis_title='Strike', yaxis_title='Spot Gamma Exposure ($ billions/1% move)',
             xaxis=dict(range=[fromStrike, toStrike]), yaxis=dict(tickformat='$,.2f'),
-            plot_bgcolor='white', font=dict(family='Arial', size=12, color='black'), width=1000, height=600)
+            plot_bgcolor='black', font=dict(family='Arial', size=12, color='black'), width=1000, height=600)
         st.plotly_chart(fig1, use_container_width=True)
 
         st.download_button("Baixar Gráfico 1 como HTML", fig1.to_html(full_html=False), file_name="grafico1_total_gamma.html")
