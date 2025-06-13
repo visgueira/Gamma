@@ -25,8 +25,8 @@ def check_login():
     password = st.sidebar.text_input("Senha", type="password")
 
     # Usuários válidos
-    usuarios = st.secrets[usuarios]
-    valid_pass = st.secrets[passw]
+    usuarios = st.secrets["auth"]
+    valid_pass = st.secrets["auth"]
     
     '''valid_users = {
         "admin": "Pqw74nbc8z@&",
