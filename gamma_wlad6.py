@@ -33,7 +33,7 @@ def check_login():
     #    "wlca": "17151" 
    # }'''
 
-    if username in usuarios and password in valid_pass[passw]: #if username in valid_users and password == valid_users[username]:
+    if username in usuarios and password in valid_pass: #if username in valid_users and password == valid_users[username]:
         return True
     elif username and password:
         st.sidebar.error("Usuário ou senha incorretos.")
