@@ -18,33 +18,8 @@ def calcGammaEx_numpy(S, K, vol, T, r, q, optType, OI):
 def isThirdFriday(d):
     return d.weekday() == 4 and 15 <= d.day <= 21
 
-
-'''def check_login():
-    st.sidebar.subheader("🔐 Acesso Restrito")
-    username = st.sidebar.text_input("Usuário")
-    password = st.sidebar.text_input("Senha", type="password")
-
-    # Usuários válidos
-    usuarios = st.secrets[usuarios]
-    valid_pass = st.secrets[passw]
-    
-    valid_users = {
-        "admin": "Pqw74nbc8z@&",
-        "wlca": "17151" 
-    }
-
-if username in usuarios and password in valid_pass[passw]:#if username in valid_users and password == valid_users[username]:
-        return True
-    elif username and password:
-        st.sidebar.error("Usuário ou senha incorretos.")
-    return False'''
-
-
 def main():
     st.set_page_config(layout="wide")
-
-    '''if not check_login():
-        st.stop()'''
 
     st.title("Análise de Gamma Exposure")
 
