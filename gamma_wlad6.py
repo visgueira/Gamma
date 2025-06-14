@@ -19,38 +19,41 @@ def isThirdFriday(d):
     return d.weekday() == 4 and 15 <= d.day <= 21
 
 
+'''def check_login():
+    st.sidebar.subheader("🔐 Acesso Restrito")
+    username = st.sidebar.text_input("Usuário")
+    password = st.sidebar.text_input("Senha", type="password")
+
+    # Usuários válidos
+    usuarios = st.secrets[usuarios]
+    valid_pass = st.secrets[passw]
+    
+    '''valid_users = {
+        "admin": "Pqw74nbc8z@&",
+        "wlca": "17151" 
+    }'''
+
+    if username in usuarios and password in valid_pass[passw]:#if username in valid_users and password == valid_users[username]:
+        return True
+    elif username and password:
+        st.sidebar.error("Usuário ou senha incorretos.")
+    return False'''
+
+
 def main():
     st.set_page_config(layout="wide")
 
-    if "authenticated" not in st.session_state:
-        st.session_state["authenticated"] = False
+    '''if not check_login():
+        st.stop()'''
 
-    if not st.session_state["authenticated"]:
-        with st.sidebar:
-            st.subheader("🔐 Acesso Restrito")
-            username = st.text_input("Usuário")
-            password = st.text_input("Senha", type="password")
-
-        usuarios = st.secrets["auth"]["usuarios"]
-        valid_pass = st.secrets["auth"]["passw"]
-
-        if username in usuarios and password in valid_pass:
-            st.session_state["authenticated"] = True
-            st.experimental_rerun()
-        elif username and password:
-            st.sidebar.error("Usuário ou senha incorretos.")
-        st.stop()
-
-    # Interface principal pós-login
     st.title("Análise de Gamma Exposure")
 
     with st.sidebar:
-        st.markdown("### 📁 Parâmetros de Entrada")
         uploaded_file = st.file_uploader("Envie o arquivo quotedata.csv", type="csv")
         bar_width1 = st.number_input("Largura das barras do Gráfico 1 (ex: 0.3)", min_value=0.01, max_value=1.0, step=0.01, value=0.3)
         bar_width2 = st.number_input("Largura das barras do Gráfico 2 (ex: 0.2)", min_value=0.01, max_value=1.0, step=0.01, value=0.2)
         levels_input = st.slider("Quantidade de níveis (resolução do gráfico 3)", min_value=20, max_value=100, step=5, value=60)
-        bar_color1 = st.color_picker("Cor das barras do Gráfico 1", '#1a76ff')
+        bar_color1 = st.color_picker("Cor das barras do Gráfico 1",  '#1a76ff')
         bar_color2 = st.color_picker("Cor das barras do Gráfico 2 (Call)", '#00cc96')
         bar_color3 = st.color_picker("Cor das barras do Gráfico 2 (Put)", '#ef553b')
 
