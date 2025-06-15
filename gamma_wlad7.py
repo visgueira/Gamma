@@ -71,6 +71,32 @@ def main():
         dfAgg = df.groupby(['StrikePrice']).sum(numeric_only=True)
         strikes = dfAgg.index.values
 
+        # Gráfico 1
+        st.subheader("Gráfico 1: Total Gamma")
+        fig1 = go.Figure(go.Bar(x=strikes, y=dfAgg['TotalGamma'].to_numpy(), width=bar_width1,
+            marker_color=bar_color1, marker_line_color='white', marker_line_width=0.15,
+            name='Gamma Exposure'))
+        fig1.add_shape(type='line', x0=spotPrice, y0=min(dfAgg['TotalGamma']), x1=spotPrice,
+            y1=max(dfAgg['TotalGamma']), line=dict(color='red', width=2, dash='dash'))
+        fig1.update_layout(title=f"Total Gamma: ${df['TotalGamma'].sum():,.2f} Bn per 1% ATIVO Move",
+            xaxis_title='Strike', yaxis_title='Spot Gamma Exposure ($ billions/1% move)',
+            xaxis=dict(range=[fromStrike, toStrike]), yaxis=dict(tickformat='$,.2f'),
+            plot_bgcolor='white', font=dict(family='Arial', size=12, color='black'), width=1000, height=600)
+        st.plotly_chart(fig1, use_container_width=True)
+
+        # Gráfico 2
+        st.subheader("Gráfico 2: Call e Put Gamma")
+        fig2 = go.Figure()
+        fig2.add_bar(x=strikes, y=dfAgg['CallGEX'].to_numpy() / 10**9, width=bar_width2, name="Call Gamma", marker_color=bar_color2)
+        fig2.add_bar(x=strikes, y=dfAgg['PutGEX'].to_numpy() / 10**9, width=bar_width2, name="Put Gamma", marker_color=bar_color3)
+        fig2.add_shape(dict(type="line", x0=spotPrice, y0=0, x1=spotPrice,
+            y1=max(dfAgg['CallGEX'].to_numpy() / 10**9), line=dict(color="black", width=2)))
+        fig2.update_layout(title_text=f"Total Gamma: ${df['TotalGamma'].sum():,.2f} Bn per 1% ATIVO Move",
+            title_font=dict(size=20, family="Arial Black"), xaxis_title="Strike",
+            yaxis_title="Spot Gamma Exposure ($ billions/1% move)", xaxis=dict(range=[fromStrike, toStrike]),
+            width=1000, height=600)
+        st.plotly_chart(fig2, use_container_width=True)
+
         # Gráfico 3
         st.subheader("Gráfico 3: Gamma Exposure Profile")
         levels = np.linspace(fromStrike, toStrike, levels_input)
