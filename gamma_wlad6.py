@@ -129,6 +129,8 @@ def main():
 
         fig3 = go.Figure()
         fig3.add_trace(go.Scatter(x=levels, y=totalGamma, mode='lines', name='All Expiries'))
+        fig.add_trace(go.Scatter(x=levels, y=totalGammaExNext, mode='lines', name='Ex-Next Expiry'))
+        fig.add_trace(go.Scatter(x=levels, y=totalGammaExFri, mode='lines', name='Ex-Next Monthly Expiry'))
         fig3.update_layout(title=f"Gamma Exposure Profile, ATIVO, {todayDate.strftime('%d %b %Y')}",
                            xaxis_title='Index Price', yaxis_title='Gamma Exposure ($ billions/1% move)',
                            width=1000, height=600)
