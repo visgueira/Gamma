@@ -5,7 +5,8 @@ from scipy.stats import norm
 from datetime import datetime, timedelta
 import streamlit as st
 
-def calcGammaEx(S, K, vol, T, r, q, optType, OI):
+
+def calcGammaEx_numpy(S, K, vol, T, r, q, optType, OI):
     with np.errstate(divide='ignore', invalid='ignore'):
         sqrtT = np.sqrt(T)
         dp = (np.log(S / K) + (r - q + 0.5 * vol ** 2) * T) / (vol * sqrtT)
@@ -13,12 +14,13 @@ def calcGammaEx(S, K, vol, T, r, q, optType, OI):
         gamma[np.isnan(gamma)] = 0
         return OI * 100 * S * S * 0.01 * gamma
 
+
 def isThirdFriday(d):
     return d.weekday() == 4 and 15 <= d.day <= 21
 
+
 def main():
     st.set_page_config(layout="wide")
-
     st.title("Análise de Gamma Exposure")
 
     with st.sidebar:
@@ -71,7 +73,6 @@ def main():
         dfAgg = df.groupby(['StrikePrice']).sum(numeric_only=True)
         strikes = dfAgg.index.values
 
-        # Gráfico 1
         st.subheader("Gráfico 1: Total Gamma")
         fig1 = go.Figure(go.Bar(x=strikes, y=dfAgg['TotalGamma'].to_numpy(), width=bar_width1,
             marker_color=bar_color1, marker_line_color='white', marker_line_width=0.15,
@@ -81,10 +82,10 @@ def main():
         fig1.update_layout(title=f"Total Gamma: ${df['TotalGamma'].sum():,.2f} Bn per 1% ATIVO Move",
             xaxis_title='Strike', yaxis_title='Spot Gamma Exposure ($ billions/1% move)',
             xaxis=dict(range=[fromStrike, toStrike]), yaxis=dict(tickformat='$,.2f'),
-            plot_bgcolor='white', font=dict(family='Arial', size=12, color='black'), width=1000, height=600)
+            plot_bgcolor='black', font=dict(family='Arial', size=12, color='black'), width=1000, height=600)
         st.plotly_chart(fig1, use_container_width=True)
+        st.download_button("Baixar Gráfico 1 como HTML", fig1.to_html(full_html=False), file_name="grafico1_total_gamma.html")
 
-        # Gráfico 2
         st.subheader("Gráfico 2: Call e Put Gamma")
         fig2 = go.Figure()
         fig2.add_bar(x=strikes, y=dfAgg['CallGEX'].to_numpy() / 10**9, width=bar_width2, name="Call Gamma", marker_color=bar_color2)
@@ -96,99 +97,59 @@ def main():
             yaxis_title="Spot Gamma Exposure ($ billions/1% move)", xaxis=dict(range=[fromStrike, toStrike]),
             width=1000, height=600)
         st.plotly_chart(fig2, use_container_width=True)
+        st.download_button("Baixar Gráfico 2 como HTML", fig2.to_html(full_html=False), file_name="grafico2_call_put.html")
 
-        # Gráfico 3
         st.subheader("Gráfico 3: Gamma Exposure Profile")
         levels = np.linspace(fromStrike, toStrike, levels_input)
-
         df['daysTillExp'] = [1/262 if (np.busday_count(todayDate.date(), x.date())) == 0 else np.busday_count(todayDate.date(), x.date())/262 for x in df.ExpirationDate]
-        nextExpiry = df['ExpirationDate'].min()
 
-        df['IsThirdFriday'] = [isThirdFriday(x) for x in df.ExpirationDate]
-        thirdFridays = df.loc[df['IsThirdFriday'] == True]
-        nextMonthlyExp = thirdFridays['ExpirationDate'].min()
+        nextExpiry = df['ExpirationDate'].min()
+        df['IsThirdFriday'] = df['ExpirationDate'].apply(isThirdFriday)
+        nextMonthlyExp = df.loc[df['IsThirdFriday']]['ExpirationDate'].min()
 
         totalGamma = []
         totalGammaExNext = []
         totalGammaExFri = []
 
         for level in levels:
-            df['callGammaEx'] = df.apply(lambda row : calcGammaEx(level, row['StrikePrice'], row['CallIV'], row['daysTillExp'], 0, 0, "call", row['CallOpenInt']), axis = 1)
-            df['putGammaEx'] = df.apply(lambda row : calcGammaEx(level, row['StrikePrice'], row['PutIV'], row['daysTillExp'], 0, 0, "put", row['PutOpenInt']), axis = 1)
+            df['callGammaEx'] = calcGammaEx_numpy(level, df['StrikePrice'].values, df['CallIV'].values, df['daysTillExp'].values, 0, 0, "call", df['CallOpenInt'].values)
+            df['putGammaEx'] = calcGammaEx_numpy(level, df['StrikePrice'].values, df['PutIV'].values, df['daysTillExp'].values, 0, 0, "put", df['PutOpenInt'].values)
 
             totalGamma.append(df['callGammaEx'].sum() - df['putGammaEx'].sum())
-
-            exNxt = df.loc[df['ExpirationDate'] != nextExpiry]
-            totalGammaExNext.append(exNxt['callGammaEx'].sum() - exNxt['putGammaEx'].sum())
-
-            exFri = df.loc[df['ExpirationDate'] != nextMonthlyExp]
-            totalGammaExFri.append(exFri['callGammaEx'].sum() - exFri['putGammaEx'].sum())
+            totalGammaExNext.append(df.loc[df['ExpirationDate'] != nextExpiry]['callGammaEx'].sum() - df.loc[df['ExpirationDate'] != nextExpiry]['putGammaEx'].sum())
+            totalGammaExFri.append(df.loc[df['ExpirationDate'] != nextMonthlyExp]['callGammaEx'].sum() - df.loc[df['ExpirationDate'] != nextMonthlyExp]['putGammaEx'].sum())
 
         totalGamma = np.array(totalGamma) / 10**9
         totalGammaExNext = np.array(totalGammaExNext) / 10**9
         totalGammaExFri = np.array(totalGammaExFri) / 10**9
 
         zeroCrossIdx = np.where(np.diff(np.sign(totalGamma)))[0]
-        zeroGamma = None
         if len(zeroCrossIdx) > 0:
             negGamma = totalGamma[zeroCrossIdx]
             posGamma = totalGamma[zeroCrossIdx+1]
             negStrike = levels[zeroCrossIdx]
             posStrike = levels[zeroCrossIdx+1]
-            zeroGamma = posStrike - ((posStrike - negStrike) * posGamma/(posGamma-negGamma))
+            zeroGamma = posStrike - ((posStrike - negStrike) * posGamma / (posGamma - negGamma))
             zeroGamma = zeroGamma[0]
+        else:
+            zeroGamma = None
 
         fig3 = go.Figure()
         fig3.add_trace(go.Scatter(x=levels, y=totalGamma, mode='lines', name='All Expiries'))
         fig3.add_trace(go.Scatter(x=levels, y=totalGammaExNext, mode='lines', name='Ex-Next Expiry'))
         fig3.add_trace(go.Scatter(x=levels, y=totalGammaExFri, mode='lines', name='Ex-Next Monthly Expiry'))
 
-        chartTitle = f"Gamma Exposure Profile, ATIVO, {todayDate.strftime('%d %b %Y')}"
-        fig3.update_layout(title_text=chartTitle, title_font=dict(size=20, family="Arial Black"),
+        fig3.update_layout(title=f"Gamma Exposure Profile, ATIVO, {todayDate.strftime('%d %b %Y')}",
                            xaxis_title='Index Price', yaxis_title='Gamma Exposure ($ billions/1% move)',
-                           width=1400, height=700)
-
-        fig3.add_trace(go.Scatter(
-            x=[fromStrike, zeroGamma, toStrike],
-            y=[min(totalGamma), min(totalGamma), min(totalGamma)],
-            mode="none",
-            fill="toself",
-            fillcolor="red",
-            opacity=0.1,
-            showlegend=False,
-            name="Negative Gamma"
-        ))
-
-        fig3.add_trace(go.Scatter(
-            x=[fromStrike, zeroGamma, toStrike],
-            y=[max(totalGamma), max(totalGamma), max(totalGamma)],
-            mode="none",
-            fill="toself",
-            fillcolor="green",
-            opacity=0.1,
-            showlegend=False,
-            name="Positive Gamma"
-        ))
-
-        fig3.add_trace(go.Scatter(
-            x=[spotPrice, spotPrice],
-            y=[min(totalGamma), max(totalGamma)],
-            mode='lines',
-            line=dict(color="red", width=1.5, dash="dash"),
-            name="Spot Price"
-        ))
-
+                           width=1000, height=600)
+        fig3.add_shape(type="line", x0=spotPrice, y0=min(totalGamma), x1=spotPrice, y1=max(totalGamma),
+                       line=dict(color="red", width=1.5))
         if zeroGamma:
-            fig3.add_trace(go.Scatter(
-                x=[zeroGamma, zeroGamma],
-                y=[min(totalGamma), max(totalGamma)],
-                mode='lines',
-                line=dict(color="green", width=1.5, dash="dot"),
-                name="Gamma Flip"
-            ))
-
+            fig3.add_shape(type="line", x0=zeroGamma, y0=min(totalGamma), x1=zeroGamma, y1=max(totalGamma),
+                           line=dict(color="green", width=1.5))
         st.plotly_chart(fig3, use_container_width=True)
         st.download_button("Baixar Gráfico 3 como HTML", fig3.to_html(full_html=False), file_name="grafico3_gamma_profile.html")
+
 
 if __name__ == "__main__":
     main()
