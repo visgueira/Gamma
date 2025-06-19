@@ -29,8 +29,8 @@ def main():
         bar_width2 = st.number_input("Largura das barras do Gráfico 2 (ex: 0.2)", min_value=0.01, max_value=15.0, step=0.01, value=0.2)
         levels_input = st.slider("Quantidade de níveis (resolução do gráfico 3)", min_value=20, max_value=100, step=5, value=60)
         #bar_color1 = st.color_picker("Cor das barras do Gráfico 1",  '#1a76ff')
-        bar_color2 = st.color_picker("Cor das barras do Gráfico 2 (Call)", '#00cc96')
-        bar_color3 = st.color_picker("Cor das barras do Gráfico 2 (Put)", '#ef553b')
+        #bar_color2 = st.color_picker("Cor das barras do Gráfico 2 (Call)", '#00cc96')
+        #bar_color3 = st.color_picker("Cor das barras do Gráfico 2 (Put)", '#ef553b')
 
     if uploaded_file:
         optionsFileData = uploaded_file.getvalue().decode("utf-8").splitlines()
@@ -88,8 +88,8 @@ def main():
 
         st.subheader("Gráfico 2: Call e Put Gamma")
         fig2 = go.Figure()
-        fig2.add_bar(x=strikes, y=dfAgg['CallGEX'].to_numpy() / 10**9, width=bar_width2, name="Call Gamma", marker_color=bar_color2)
-        fig2.add_bar(x=strikes, y=dfAgg['PutGEX'].to_numpy() / 10**9, width=bar_width2, name="Put Gamma", marker_color=bar_color3)
+        fig2.add_bar(x=strikes, y=dfAgg['CallGEX'].to_numpy() / 10**9, width=bar_width2, name="Call Gamma", marker_color='#00cc96')
+        fig2.add_bar(x=strikes, y=dfAgg['PutGEX'].to_numpy() / 10**9, width=bar_width2, name="Put Gamma", marker_color='#ef553b')
         fig2.add_shape(dict(type="line", x0=spotPrice, y0=0, x1=spotPrice,
             y1=max(dfAgg['CallGEX'].to_numpy() / 10**9), line=dict(color="black", width=2)))
         fig2.update_layout(title_text=f"Total Gamma: ${df['TotalGamma'].sum():,.2f} Bn per 1% ATIVO Move",
