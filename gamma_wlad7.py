@@ -140,7 +140,7 @@ def main():
         fig3.add_trace(go.Scatter(x=levels, y=totalGammaExNext, mode='lines',
                                   name='Ex-Next Expiry', line=dict(color='orange')))
         fig3.add_trace(go.Scatter(x=levels, y=totalGammaExFri, mode='lines',
-                                  name='Ex-Next Monthly Expiry', line=dict(color='purple')))
+                                  name='Ex-Next Monthly Expiry', line=dict(color='yellow')))
 
         fig3.update_layout(title=f"Gamma Exposure Profile, ATIVO, {todayDate.strftime('%d %b %Y')}",
                            xaxis_title='Index Price', yaxis_title='Gamma Exposure ($ billions/1% move)',
