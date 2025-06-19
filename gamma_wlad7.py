@@ -135,13 +135,17 @@ def main():
             zeroGamma = None
 
         fig3 = go.Figure()
-        fig3.add_trace(go.Scatter(x=levels, y=totalGamma, mode='lines', name='All Expiries'))
-        fig3.add_trace(go.Scatter(x=levels, y=totalGammaExNext, mode='lines', name='Ex-Next Expiry'))
-        fig3.add_trace(go.Scatter(x=levels, y=totalGammaExFri, mode='lines', name='Ex-Next Monthly Expiry'))
+        fig3.add_trace(go.Scatter(x=levels, y=totalGamma, mode='lines',
+                                  name='All Expiries', line=dict(color='blue')))
+        fig3.add_trace(go.Scatter(x=levels, y=totalGammaExNext, mode='lines',
+                                  name='Ex-Next Expiry', line=dict(color='orange')))
+        fig3.add_trace(go.Scatter(x=levels, y=totalGammaExFri, mode='lines',
+                                  name='Ex-Next Monthly Expiry', line=dict(color='purple')))
 
         fig3.update_layout(title=f"Gamma Exposure Profile, ATIVO, {todayDate.strftime('%d %b %Y')}",
                            xaxis_title='Index Price', yaxis_title='Gamma Exposure ($ billions/1% move)',
                            width=1000, height=600)
+
         fig3.add_shape(type="line", x0=spotPrice, y0=min(totalGamma), x1=spotPrice, y1=max(totalGamma),
                        line=dict(color="red", width=1.5))
         if zeroGamma:
