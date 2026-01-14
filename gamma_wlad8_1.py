@@ -212,11 +212,12 @@ A_Zero ({zeroGamma:.2f});"""
         st.sidebar.markdown("---")
         st.sidebar.header("Downloads")
         st.sidebar.download_button(
-            label="📥 Baixar TXT (Níveis Gamma)",
+            label="📥 Baixar TXT (Gráfico 1)",
             data=txt_output,
             file_name="niveis_gamma.txt",
             mime="text/plain"
         )
 
 if __name__ == "__main__":
+
     main()
